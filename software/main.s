@@ -30,6 +30,9 @@ IDLE: #obtem os dados de configuração
     andi s0, t0, 0x1F    # saving on s0 with only the 5 first bits
     addi, a3, a3, 1
     li t1, 16
+    li s6, 0
+    li s4, 0
+    li s3, 0
     bge s0, t1, GEN_NUMBER
     j IDLE
 
@@ -122,7 +125,7 @@ CONTINUE_SHOW_LEDS:
     j RESET
 
 ONE_LED_ON:
-    li t3, 10
+    li t3, 5
     li t1, 0
     beq t2, t1, SHOW_GREEN_LED
     li t1, 1
@@ -142,7 +145,7 @@ ALL_LEDS_ON:
     sw a6, 8(a0)     # LED 2 = azul
     sw a7, 12(a0)    # LED 3 = amarelo
 
-    j CONTINUE_SHOW_LEDS
+    j AWAIT_LEDS_TURN_ON
 
 SHOW_GREEN_LED:
     sw a4, 0(a0)     # verde
@@ -182,11 +185,13 @@ TURN_OFF_ALL_LEDS:
     sw t0, 4(a0)
     sw t0, 8(a0)
     sw t0, 12(a0)
-    li t3, 10
+    li t3, 5
 
 AWAIT_LEDS_TURN_OFF:
     addi t3, t3, -1
     bnez t3, AWAIT_LEDS_TURN_OFF
+    li t5, 1
+    bgt s6, t5, IDLE
     j   SHOW_LEDS
 
 RESET: 
@@ -233,7 +238,6 @@ BUTTON_YELLOW_PRESSED:
 COMPARE: 
     slli t0, s3, 1            #indice
     li t4, 16
-    j COMPARE
     bge s3, t4, READ_LED_SEQUENCE_REG2
 
 READ_LED_SEQUENCE_REG1:
@@ -248,7 +252,7 @@ READ_LED_SEQUENCE_REG2:
 CONTINUE_COMPARE:
     bne t2, s5, DEFEAT
     addi s3, s3, 1
-    bgt s3, s5 EVALUATE 
+    bge s3, s4 EVALUATE 
     j GET_PLAYER
 
 EVALUATE: 
@@ -260,9 +264,11 @@ EVALUATE:
     j GEN_NUMBER
 
 VICTORY: 
+    li t3, 10
     li s6, 2 #all  leds habilitados, precisa configurar o tempo que isso vai ficar ligado
-    j IDLE 
+    j ALL_LEDS_ON
 
 DEFEAT: 
+    li t3, 5
     li s6, 2 #all  leds habilitados, precisa configurar o tempo que isso vai ficar ligado
-    j IDLE
+    j ALL_LEDS_ON
