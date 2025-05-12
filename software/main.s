@@ -125,7 +125,7 @@ CONTINUE_SHOW_LEDS:
     j RESET
 
 ONE_LED_ON:
-    li t3, 5
+    li t3, 2   #TEMPO DE DELAY
     li t1, 0
     beq t2, t1, SHOW_GREEN_LED
     li t1, 1
@@ -185,7 +185,7 @@ TURN_OFF_ALL_LEDS:
     sw t0, 4(a0)
     sw t0, 8(a0)
     sw t0, 12(a0)
-    li t3, 5
+    li t3, 2   #TEMPO DE DELAY
 
 AWAIT_LEDS_TURN_OFF:
     addi t3, t3, -1
