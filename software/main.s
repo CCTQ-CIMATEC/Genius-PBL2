@@ -18,6 +18,10 @@ main:
     li a0, LED_MATRIX_0_BASE
     li a1, D_PAD_0_BASE
     li a2, SWITCHES_0_BASE
+    li a4, GREEN_LED
+    li a5, RED_LED
+    li a6, BLUE_LED
+    li a7, YELLOW_LED
 
     j IDLE
 
@@ -111,17 +115,86 @@ SHOW_READ_LED_SEQUENCE_REG2:
     andi t2, t2, 0b11
 
 CONTINUE_SHOW_LEDS:
-    li s6, 1 #nesse ponto t2 possui qual a cor deve ser acionada e s6 informa que o led deve ser acesso, falta apartir disso, exibir, contar 1s e desligar(s6 = 0)
+     li t0, BLACK         # t0 = preto (apagado por padrão)
+    
+    addi s3, s3, 1
+    ble s3, s4, ONE_LED_ON
+    j RESET
+
+ONE_LED_ON:
+    li t3, 10
+    li t1, 0
+    beq t2, t1, SHOW_GREEN_LED
+    li t1, 1
+    beq t2, t1, SHOW_RED_LED
+    li t1, 2
+    beq t2, t1, SHOW_BLUE_LED
+    li t1, 3
+    beq t2, t1, SHOW_YELLOW_LED
+    
     j CONTINUE_SHOW_LEDS
-    addi s3, s3, 1 
-    bgt s4, s3, SHOW_LEDS 
+
+
+ALL_LEDS_ON:
+
+    sw a4, 0(a0)     # LED 0 = verde
+    sw a5, 4(a0)     # LED 1 = vermelho
+    sw a6, 8(a0)     # LED 2 = azul
+    sw a7, 12(a0)    # LED 3 = amarelo
+
+    j CONTINUE_SHOW_LEDS
+
+SHOW_GREEN_LED:
+    sw a4, 0(a0)     # verde
+    sw t0, 4(a0)     # preto
+    sw t0, 8(a0)     # preto
+    sw t0, 12(a0)    # preto
+    j AWAIT_LEDS_TURN_ON
+
+SHOW_RED_LED:
+    sw t0, 0(a0)
+    sw a5, 4(a0)
+    sw t0, 8(a0)
+    sw t0, 12(a0)
+    j AWAIT_LEDS_TURN_ON
+
+SHOW_BLUE_LED:
+    sw t0, 0(a0)
+    sw t0, 4(a0)
+    sw a6, 8(a0)
+    sw t0, 12(a0)
+    j AWAIT_LEDS_TURN_ON
+
+SHOW_YELLOW_LED:
+    sw t0, 0(a0)
+    sw t0, 4(a0)
+    sw t0, 8(a0)
+    sw a7, 12(a0)
+    j AWAIT_LEDS_TURN_ON
+    
+
+AWAIT_LEDS_TURN_ON:
+    addi t3, t3, -1
+    bnez t3, AWAIT_LEDS_TURN_ON
+
+TURN_OFF_ALL_LEDS:
+    sw t0, 0(a0)
+    sw t0, 4(a0)
+    sw t0, 8(a0)
+    sw t0, 12(a0)
+    li t3, 10
+
+AWAIT_LEDS_TURN_OFF:
+    addi t3, t3, -1
+    bnez t3, AWAIT_LEDS_TURN_OFF
+    j   SHOW_LEDS
 
 RESET: 
     li s3, 0  
 
 GET_PLAYER: 
     li s5, 2 #ok, isso ta merda, mas vamos assumir que o usuario sempre vai digitar a cor correspondente a 10 
-
+    j GET_PLAYER
 COMPARE: 
     slli t0, s3, 1            #indice
     li t4, 16
