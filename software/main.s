@@ -193,11 +193,47 @@ RESET:
     li s3, 0  
 
 GET_PLAYER: 
-    li s5, 2 #ok, isso ta merda, mas vamos assumir que o usuario sempre vai digitar a cor correspondente a 10 
+    lw t0, 0(a1)
+    lw t1, 4(a1)
+    lw t2, 8(a1)
+    lw t3, 12(a1)
+
+    # Verifica botão green
+    bnez t0, BUTTON_GREEN_PRESSED
+
+    # Verifica botão red
+    bnez t1, BUTTON_RED_PRESSED
+
+    # Verifica botão blue
+    bnez t2, BUTTON_BLUE_PRESSED
+
+    # Verifica botão yellow
+    bnez t3, BUTTON_YELLOW_PRESSED
+
+    # Nenhum botão pressionado, repete
     j GET_PLAYER
+
+BUTTON_GREEN_PRESSED:
+    li s5, 0
+    j COMPARE
+
+BUTTON_RED_PRESSED:
+    li s5, 1
+    j COMPARE
+
+BUTTON_BLUE_PRESSED:
+    li s5, 2
+    j COMPARE
+
+BUTTON_YELLOW_PRESSED:
+    li s5, 3
+    j COMPARE
+
+
 COMPARE: 
     slli t0, s3, 1            #indice
     li t4, 16
+    j COMPARE
     bge s3, t4, READ_LED_SEQUENCE_REG2
 
 READ_LED_SEQUENCE_REG1:
