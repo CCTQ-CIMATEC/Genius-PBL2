@@ -42,7 +42,40 @@ GEN_NUMBER:
     beqz s4, USE_RANDOM_NUMBER         #Se tamanho da sequencia == 0, vai para use_random_number
 
 USE_PLAYER_INPUT:
-    andi t0, s4, 0b11
+    lw t0, 0(a1)
+    lw t1, 4(a1)
+    lw t2, 8(a1)
+    lw t3, 12(a1)
+
+    # Verifica botão green
+    bnez t0, BUTTON_GREEN_PRESSED_MANDO_EU
+
+    # Verifica botão red
+    bnez t1, BUTTON_RED_PRESSED_MANDO_EU
+
+    # Verifica botão blue
+    bnez t2, BUTTON_BLUE_PRESSED_MANDO_EU
+
+    # Verifica botão yellow
+    bnez t3, BUTTON_YELLOW_PRESSED_MANDO_EU
+
+    # Nenhum botão pressionado, repete
+    j USE_PLAYER_INPUT
+
+BUTTON_GREEN_PRESSED_MANDO_EU:
+    li t0, 0
+    j SELECT_WHERE_SAVE
+
+BUTTON_RED_PRESSED_MANDO_EU:
+    li t0, 1
+    j SELECT_WHERE_SAVE
+
+BUTTON_BLUE_PRESSED_MANDO_EU:
+    li t0, 2
+    j SELECT_WHERE_SAVE
+
+BUTTON_YELLOW_PRESSED_MANDO_EU:
+    li t0, 3
     j SELECT_WHERE_SAVE
 
 USE_RANDOM_NUMBER:
