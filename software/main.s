@@ -64,18 +64,26 @@ USE_PLAYER_INPUT:
 
 BUTTON_GREEN_PRESSED_MANDO_EU:
     li t0, 0
+    lw t1, 0(a1)
+    bnez t1, BUTTON_GREEN_PRESSED_MANDO_EU
     j SELECT_WHERE_SAVE
 
 BUTTON_RED_PRESSED_MANDO_EU:
     li t0, 1
+    lw t1, 4(a1)
+    bnez t1, BUTTON_RED_PRESSED_MANDO_EU
     j SELECT_WHERE_SAVE
 
 BUTTON_BLUE_PRESSED_MANDO_EU:
     li t0, 2
+    lw t1, 8(a1)
+    bnez t1, BUTTON_BLUE_PRESSED_MANDO_EU
     j SELECT_WHERE_SAVE
 
 BUTTON_YELLOW_PRESSED_MANDO_EU:
     li t0, 3
+    lw t1, 12(a1)
+    bnez t1, BUTTON_YELLOW_PRESSED_MANDO_EU
     j SELECT_WHERE_SAVE
 
 USE_RANDOM_NUMBER:
@@ -158,7 +166,15 @@ CONTINUE_SHOW_LEDS:
     j RESET
 
 ONE_LED_ON:
-    li t3, 2   #TEMPO DE DELAY
+    li t3, 2           # TEMPO BASE DE DELAY (2)
+    andi t4, s0, 2     # Isola o segundo bit menos significativo de s0
+    beqz t4, SKIP_SHIFT
+    j CHECK_LED
+
+SKIP_SHIFT:
+    slli t3, t3, 1     # Se o bit for 0, dobra t3 (2 -> 4)
+
+CHECK_LED:
     li t1, 0
     beq t2, t1, SHOW_GREEN_LED
     li t1, 1
@@ -171,12 +187,21 @@ ONE_LED_ON:
     j CONTINUE_SHOW_LEDS
 
 
-ALL_LEDS_ON:
+ALL_LED_DEFEAT:
+
+    sw a5, 0(a0)     # LED 0 = verde
+    sw a5, 4(a0)     # LED 1 = vermelho
+    sw a5, 8(a0)     # LED 2 = azul
+    sw a5, 12(a0)    # LED 3 = amarelo
+
+    j AWAIT_LEDS_TURN_ON
+
+ALL_LED_VICTORY:
 
     sw a4, 0(a0)     # LED 0 = verde
-    sw a5, 4(a0)     # LED 1 = vermelho
-    sw a6, 8(a0)     # LED 2 = azul
-    sw a7, 12(a0)    # LED 3 = amarelo
+    sw a4, 4(a0)     # LED 1 = vermelho
+    sw a4, 8(a0)     # LED 2 = azul
+    sw a4, 12(a0)    # LED 3 = amarelo
 
     j AWAIT_LEDS_TURN_ON
 
@@ -218,7 +243,13 @@ TURN_OFF_ALL_LEDS:
     sw t0, 4(a0)
     sw t0, 8(a0)
     sw t0, 12(a0)
-    li t3, 2   #TEMPO DE DELAY
+    li t3, 2           # TEMPO BASE DE DELAY (2)
+    andi t4, s0, 2     # Isola o segundo bit menos significativo de s0
+    beqz t4, SKIP_SHIFT_2
+    j AWAIT_LEDS_TURN_OFF
+
+SKIP_SHIFT_2:
+    slli t3, t3, 1 
 
 AWAIT_LEDS_TURN_OFF:
     addi t3, t3, -1
@@ -253,18 +284,26 @@ GET_PLAYER:
 
 BUTTON_GREEN_PRESSED:
     li s5, 0
+    lw t0, 0(a1)
+    bnez t0, BUTTON_GREEN_PRESSED
     j COMPARE
 
 BUTTON_RED_PRESSED:
     li s5, 1
+    lw t1, 4(a1)
+    bnez t1, BUTTON_RED_PRESSED
     j COMPARE
 
 BUTTON_BLUE_PRESSED:
     li s5, 2
+    lw t2, 8(a1)
+    bnez t2, BUTTON_BLUE_PRESSED
     j COMPARE
 
 BUTTON_YELLOW_PRESSED:
     li s5, 3
+    lw t3, 12(a1)
+    bnez t3, BUTTON_YELLOW_PRESSED
     j COMPARE
 
 
@@ -299,9 +338,9 @@ EVALUATE:
 VICTORY: 
     li t3, 10
     li s6, 2 #all  leds habilitados, precisa configurar o tempo que isso vai ficar ligado
-    j ALL_LEDS_ON
+    j ALL_LED_VICTORY
 
 DEFEAT: 
     li t3, 5
     li s6, 2 #all  leds habilitados, precisa configurar o tempo que isso vai ficar ligado
-    j ALL_LEDS_ON
+    j ALL_LED_DEFEAT
