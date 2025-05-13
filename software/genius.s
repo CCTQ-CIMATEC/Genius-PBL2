@@ -226,11 +226,11 @@ ST_ADD_COLOR:
         j STORE
     
     ADD_YELLOW:
-        li t2, RED_LED
+        li t2, YELLOW_LED
         sw t2, 12(a0)
         RY2: lw t1, D_PAD_0_UP
             bnez t1, RY2
-        li t3, RED_CODE
+        li t3, YELLOW_CODE
 
     STORE:
 
