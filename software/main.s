@@ -189,20 +189,29 @@ CHECK_LED:
 
 ALL_LED_DEFEAT:
 
-    sw a5, 0(a0)     # LED 0 = verde
+    sw a4, 0(a0)     # LED 0 = verde
     sw a5, 4(a0)     # LED 1 = vermelho
-    sw a5, 8(a0)     # LED 2 = azul
-    sw a5, 12(a0)    # LED 3 = amarelo
+    sw a6, 8(a0)     # LED 2 = azul
+    sw a7, 12(a0)    # LED 3 = amarelo
 
     j AWAIT_LEDS_TURN_ON
 
 ALL_LED_VICTORY:
 
     sw a4, 0(a0)     # LED 0 = verde
-    sw a4, 4(a0)     # LED 1 = vermelho
-    sw a4, 8(a0)     # LED 2 = azul
-    sw a4, 12(a0)    # LED 3 = amarelo
+    sw a5, 4(a0)     # LED 1 = vermelho
+    sw a6, 8(a0)     # LED 2 = azul
+    sw a7, 12(a0)    # LED 3 = amarelo
 
+    j AWAIT_LEDS_TURN_ON_VICTORY
+
+CONTINUE_VICTORY:
+    sw a4, 0(a0)     # LED 0 = verde
+    sw a5, 4(a0)     # LED 1 = vermelho
+    sw a6, 8(a0)     # LED 2 = azul
+    sw a7, 12(a0)    # LED 3 = amarelo
+    
+    li t3, 5
     j AWAIT_LEDS_TURN_ON
 
 SHOW_GREEN_LED:
@@ -233,6 +242,22 @@ SHOW_YELLOW_LED:
     sw a7, 12(a0)
     j AWAIT_LEDS_TURN_ON
     
+AWAIT_LEDS_TURN_ON_VICTORY:
+    addi t3, t3, -1
+    bnez t3, AWAIT_LEDS_TURN_ON_VICTORY
+
+TURN_OFF_LEDS_VICTORY:
+    sw t0, 0(a0)
+    sw t0, 4(a0)
+    sw t0, 8(a0)
+    sw t0, 12(a0)
+    li t3, 5           # TEMPO BASE DE DELAY (5)
+    j AWAIT_LEDS_TURN_OFF_VICTORY
+
+AWAIT_LEDS_TURN_OFF_VICTORY:
+    addi t3, t3, -1
+    bnez t3, AWAIT_LEDS_TURN_OFF_VICTORY
+    j   CONTINUE_VICTORY
 
 AWAIT_LEDS_TURN_ON:
     addi t3, t3, -1
@@ -243,7 +268,7 @@ TURN_OFF_ALL_LEDS:
     sw t0, 4(a0)
     sw t0, 8(a0)
     sw t0, 12(a0)
-    li t3, 2           # TEMPO BASE DE DELAY (2)
+    li t3, 5           # TEMPO BASE DE DELAY (5)
     andi t4, s0, 2     # Isola o segundo bit menos significativo de s0
     beqz t4, SKIP_SHIFT_2
     j AWAIT_LEDS_TURN_OFF
@@ -336,11 +361,11 @@ EVALUATE:
     j GEN_NUMBER
 
 VICTORY: 
-    li t3, 10
+    li t3, 5
     li s6, 2 #all  leds habilitados, precisa configurar o tempo que isso vai ficar ligado
     j ALL_LED_VICTORY
 
 DEFEAT: 
-    li t3, 5
+    li t3, 10
     li s6, 2 #all  leds habilitados, precisa configurar o tempo que isso vai ficar ligado
     j ALL_LED_DEFEAT
