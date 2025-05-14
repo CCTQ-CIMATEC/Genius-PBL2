@@ -160,40 +160,17 @@ ST_PLAYER_INPUT:
     # (Implementar no simulador futuramente)
 
     li   t5,     0b11                        # Simula jogador apertando botão da cor amarela
-    beq  t5, t2  INPUT_RED_BUTTON            # Jogada 1: Vermelho (11)
+    beq  t5, t2  ST_EVALUATE                 # Jogada 1: Vermelho (11)
     
     li   t5,     0b10                        # Simula jogador apertando botão da cor amarela  
-    beq  t5, t2, INPUT_YELLOW_BUTTON         # Jogada 2: Amarelo (10)
+    beq  t5, t2  ST_EVALUATE                 # Jogada 2: Amarelo (10)
 
     li   t5,     0b01                        # Simula jogador apertando botão da cor verde   
-    beq  t5, t2, INPUT_GREEN_BUTTON          # Jogada 3: Verde (00)
+    beq  t5, t2  ST_EVALUATE                 # Jogada 3: Verde (00)
    
     li   t5,     0b00                        # Simula jogador apertando botão da cor azul     
-    beq  t5, t2, INPUT_BLUE_BUTTON           # Jogada 4: Azul (01)
+    beq  t5, t2  ST_EVALUATE                 # Jogada 4: Azul (01)
 
-#########################################################
-#   Aciona a saída do respectivo LED           
-#########################################################
-
-INPUT_RED_BUTTON:
-
-    addi  s5, s5, 1                          # Registra jogada do jogador
-    j     ST_EVALUATE                        # Vai para o estado de avaliar Vitória ou derrota
-
-INPUT_YELLOW_BUTTON:
-
-    addi  s5, s5, 1                          # Registra a jogada do player
-    j     ST_EVALUATE                        # Vai para o estado de avaliar Vitória ou derrota
-
-INPUT_BLUE_BUTTON:
-
-    addi  s5, s5, 1                          # Registra a jogada do player
-    j     ST_EVALUATE                        # Vai para o estado de avaliar Vitória ou derrota
-
-INPUT_GREEN_BUTTON:
-
-    addi  s5, s5, 1                          # Registra a jogada do player
-    j     ST_EVALUATE                        # Vai para o estado de avaliar Vitória ou derrota
 
 #########################################################
 #   Avalia se a jogada do jogador está correta
@@ -202,6 +179,7 @@ INPUT_GREEN_BUTTON:
 
 ST_EVALUATE:
    
+    addi s5, s5, 1                           # Registra jogada do jogador
     addi t2, s1, 0                           # Copia o registrador s1 para o t2
     sll  t2, s1, t0                          # Rotaciona os bits de acordo com t0
     andi t2, t2, 0b11                        # Aplica a máscara ao conjunto de bits
